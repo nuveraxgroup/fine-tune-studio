@@ -24,7 +24,6 @@ uploadRouter.get("/temp", (req, res, next) => {
 })
 
 uploadRouter.post("/push", async (req, res, next) => {
-  console.log("body", req.body)
   const bd: UploadToOpenAI = req.body
   const fileLoc = `${tempLocalFiles}/${bd.fileName}`
   const fineTuneFile = await openai.files.create({ file: fs.createReadStream(fileLoc), purpose: 'fine-tune' })
