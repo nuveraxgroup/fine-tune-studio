@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { MainLayout } from "../common/MainLayout";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";

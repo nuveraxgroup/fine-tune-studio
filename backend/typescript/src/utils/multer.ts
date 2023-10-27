@@ -39,16 +39,19 @@ const ext = (filename: string): string => {
 }
 
 export const readDirSync = (path: string): FileDir[] => {
-  const dir = fs.opendirSync(path)
-  let entity: fs.Dirent = null;
-  const listing: FileDir[] = []
-  while((entity = dir.readSync()) !== null) {
-    if(entity.isFile()) {
-      listing.push({ type: 'f', name: entity.name })
-    } else if(entity.isDirectory()) {
-      listing.push({ type: 'd', name: entity.name })
+  if (fs.existsSync(path)){
+    const dir = fs.opendirSync(path)
+    let entity: fs.Dirent = null;
+    const listing: FileDir[] = []
+    while((entity = dir.readSync()) !== null) {
+      if(entity.isFile()) {
+        listing.push({ type: 'f', name: entity.name })
+      } else if(entity.isDirectory()) {
+        listing.push({ type: 'd', name: entity.name })
+      }
     }
+    dir.closeSync()
+    return listing
   }
-  dir.closeSync()
-  return listing
+  return []
 }

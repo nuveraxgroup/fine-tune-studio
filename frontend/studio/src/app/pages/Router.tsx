@@ -9,6 +9,12 @@ export const pagesRouter = () => {
         Component: Home
       }
     }}/>
+    <Route path="/jsonl" lazy={async () => {
+      const { JsonlHome } = await import("./jsonl/JsonlHome")
+      return {
+        Component: JsonlHome
+      }
+    }}/>
   </>)
 }
 

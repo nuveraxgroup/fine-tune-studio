@@ -23,14 +23,14 @@ uploadRouter.put("/cancel/:id", async (req, res, next) => {
   res.send({ status })
 })
 
-uploadRouter.get("/ft-events/:id", async (req, res, next) => {
+uploadRouter.get("/events/:id", async (req, res, next) => {
   const limit = req.query["limit"] ?? 100
   const id = req.params["id"]
   const events = await openai.fineTuning.jobs.listEvents(id, { limit: Number(limit) })
   res.send({ events })
 })
 
-uploadRouter.delete("/ft-model/:id", async (req, res, next) => {
+uploadRouter.delete("/model/:id", async (req, res, next) => {
   const id = req.params["id"]
   const events = await openai.models.del(id)
   res.send({ events })
