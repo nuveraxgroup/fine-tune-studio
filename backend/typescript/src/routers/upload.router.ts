@@ -15,12 +15,12 @@ export const openai = new OpenAI();
 export const uploadRouter = express.Router()
 
 uploadRouter.post("/jsonl", upload.single('file'), async (req, res, next) => {
-  res.send({ file: req.file })
+  res.json({ file: req.file })
 })
 
-uploadRouter.get("/temp", (req, res, next) => {
+uploadRouter.get("/temp", async (req, res, next) => {
   const files = readDirSync(tempLocalFiles)
-  res.send({ files })
+  res.json({ files })
 })
 
 uploadRouter.post("/push", async (req, res, next) => {
@@ -29,5 +29,5 @@ uploadRouter.post("/push", async (req, res, next) => {
   const fineTuneFile = await openai.files.create({ file: fs.createReadStream(fileLoc), purpose: 'fine-tune' })
   fs.unlinkSync(fileLoc)
   const fineTune = await openai.fineTuning.jobs.create({ training_file: fineTuneFile.id, model: 'gpt-3.5-turbo' })
-  res.send({ fineTuneFile: fineTuneFile, fineTuneJob: fineTune });
+  res.json({ fineTuneFile: fineTuneFile, fineTuneJob: fineTune });
 })

@@ -6,10 +6,17 @@ export interface FilesInfo {
 export interface UploadToOpenAI {
   fileName: string
 }
+export interface SimpleFIle {
+  type: string
+  name: string
+}
+export interface LocalFiles {
+  files: SimpleFIle[]
+}
 
 interface UploadServiceProps {
   jsonl(file: FilesInfo): Promise<any>
-  localFiles(): Promise<any>
+  localFiles(): Promise<LocalFiles>
   push(data: UploadToOpenAI): Promise<any>
 }
 
@@ -32,7 +39,11 @@ export const uploadService = (): UploadServiceProps => {
   const localFiles = async (): Promise<any> => {
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/upload/temp`, {
       method: 'GET',
-      // headers: { "Authorization": `Bearer ${token}` }
+      headers: {
+        Accept: "application/json; charset=utf-8"
+        // "Content-Type": "application/json; charset=utf-8"
+        // "Authorization": `Bearer ${token}`
+      }
     })
     if (response.ok) {
       return await response.json()

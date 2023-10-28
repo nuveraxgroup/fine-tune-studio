@@ -15,6 +15,12 @@ export const pagesRouter = () => {
         Component: JsonlHome
       }
     }}/>
+    <Route path="/fine-tune" lazy={async () => {
+      const { FinetuneHome } = await import("./fine-tune/FinetuneHome")
+      return {
+        Component: FinetuneHome
+      }
+    }}/>
   </>)
 }
 

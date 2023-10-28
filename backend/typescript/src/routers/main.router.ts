@@ -9,4 +9,4 @@ mainRouter.get('/home', (req, res) => {
 });
 
 mainRouter.use("/upload", uploadRouter)
-mainRouter.use("/fine-tune", fineTuneRouter)
+mainRouter.use("/finetune", fineTuneRouter)

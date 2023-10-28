@@ -1,37 +1,34 @@
 import express from 'express'
-import { uploadRouter } from "./upload.router";
 import OpenAI from 'openai'
-
-export const fineTuneRouter = express.Router()
 export const openai = new OpenAI();
-
-uploadRouter.get("/list", async (req, res, next) => {
+export const fineTuneRouter = express.Router()
+fineTuneRouter.get("/list", async (req, res, next) => {
   const limit = req.query["limit"] ?? 100
   const page = await openai.fineTuning.jobs.list({ limit: Number(limit) })
-  res.send({ page })
+  res.json({ page })
 })
 
-uploadRouter.get("/retrieve/:id", async (req, res, next) => {
+fineTuneRouter.get("/retrieve/:id", async (req, res, next) => {
   const id = req.params["id"]
-  const fineTune = await openai.fineTuning.jobs.retrieve(`${id}`)
-  res.send({ fineTune })
+  const fineTune = await openai.fineTuning.jobs.retrieve(id)
+  res.json({ fineTune })
 })
 
-uploadRouter.put("/cancel/:id", async (req, res, next) => {
+fineTuneRouter.put("/cancel/:id", async (req, res, next) => {
   const id = req.params["id"]
-  const status = await openai.fineTuning.jobs.cancel(`${id}`)
-  res.send({ status })
+  const status = await openai.fineTuning.jobs.cancel(id)
+  res.json({ status })
 })
 
-uploadRouter.get("/events/:id", async (req, res, next) => {
+fineTuneRouter.get("/events/:id", async (req, res, next) => {
   const limit = req.query["limit"] ?? 100
   const id = req.params["id"]
   const events = await openai.fineTuning.jobs.listEvents(id, { limit: Number(limit) })
-  res.send({ events })
+  res.json({ events })
 })
 
-uploadRouter.delete("/model/:id", async (req, res, next) => {
+fineTuneRouter.delete("/model/:id", async (req, res, next) => {
   const id = req.params["id"]
   const events = await openai.models.del(id)
-  res.send({ events })
+  res.json({ events })
 })
