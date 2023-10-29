@@ -3,6 +3,10 @@ export interface FilesInfo {
   file: File
 }
 
+export interface DeleteFile {
+  fileNames: string[]
+}
+
 export interface UploadToOpenAI {
   fileName: string
 }
@@ -16,6 +20,7 @@ export interface LocalFiles {
 
 interface UploadServiceProps {
   jsonl(file: FilesInfo): Promise<any>
+  jsonlDel(data: DeleteFile): Promise<any>
   localFiles(): Promise<LocalFiles>
   push(data: UploadToOpenAI): Promise<any>
 }
@@ -29,6 +34,21 @@ export const uploadService = (): UploadServiceProps => {
       method: 'POST',
       // headers: { "Authorization": `Bearer ${token}` },
       body: formData,
+    })
+    if (response.ok) {
+      return await response.json()
+    }
+    return Promise.reject(new Error("Error"))
+  }
+
+  const jsonlDel = async (data: DeleteFile): Promise<any> => {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/upload/jsonl-del`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+        // "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(data),
     })
     if (response.ok) {
       return await response.json()
@@ -65,6 +85,7 @@ export const uploadService = (): UploadServiceProps => {
 
   return {
     jsonl,
+    jsonlDel,
     localFiles,
     push
   }

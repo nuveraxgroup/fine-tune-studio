@@ -2,7 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import * as fs from "fs"
 import OpenAI from 'openai'
-import { UploadToOpenAI } from "../models/file.dto";
+import { DeleteFile, UploadToOpenAI } from "../models/file.dto";
 import { jsonlFileFilter as fileFilter, readDirSync, storage, tempLocalFiles } from "../utils/multer";
 
 const upload = multer({
@@ -16,6 +16,16 @@ export const uploadRouter = express.Router()
 
 uploadRouter.post("/jsonl", upload.single('file'), async (req, res, next) => {
   res.json({ file: req.file })
+})
+
+uploadRouter.post("/jsonl-del", async (req, res, next) => {
+  const bd: DeleteFile = req.body
+  console.log("bd", bd)
+  bd.fileNames.forEach((e) => {
+    const fileLoc = `${tempLocalFiles}/${e}`
+    fs.unlinkSync(fileLoc)
+  })
+  res.json({ success: true })
 })
 
 uploadRouter.get("/temp", async (req, res, next) => {
