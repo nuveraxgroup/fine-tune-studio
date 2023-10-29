@@ -1,12 +1,26 @@
 
+export interface ErrorJob {
+  code: string
+  param: string
+  message: string
+}
 export interface Job {
   object: string
   id: string
-  created_at: string
-  level: string
-  message: string
-  data: any
-  type: string
+  model: string
+  created_at: number
+  finished_at: number | null
+  fine_tuned_model: string | null
+  organization_id: string
+  result_files: any[]
+  status: string
+  validation_file: string | null
+  training_file: string
+  hyperparameters: {
+    n_epochs: string
+  }
+  trained_tokens: string | null
+  error?: ErrorJob | null
 }
 export interface BodyJob {
   data: Job[]

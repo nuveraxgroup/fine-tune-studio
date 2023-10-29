@@ -225,10 +225,11 @@ export default function EnhancedTable<D extends Row>(props: MainEnhancedTablePro
     }
   }, [selected]);
   useEffect(() => {
-    if(data.length === 0) {
+    const dd = props.data ?? []
+    if(dd.length === 0) {
       setSelected([])
     }
-  }, [data]);
+  }, [props.data]);
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof D,

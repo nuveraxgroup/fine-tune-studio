@@ -8,7 +8,9 @@ export interface DeleteFile {
 }
 
 export interface UploadToOpenAI {
-  fileName: string
+  trainingFile: string
+  validationFIle?: string
+  suffix?: string
 }
 export interface SimpleFIle {
   type: string
@@ -74,7 +76,10 @@ export const uploadService = (): UploadServiceProps => {
   const push = async (data: UploadToOpenAI): Promise<any> => {
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/upload/push`, {
       method: 'POST',
-      // headers: { "Authorization": `Bearer ${token}` },
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+        // "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(data),
     })
     if (response.ok) {

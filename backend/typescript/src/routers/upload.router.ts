@@ -35,9 +35,26 @@ uploadRouter.get("/temp", async (req, res, next) => {
 
 uploadRouter.post("/push", async (req, res, next) => {
   const bd: UploadToOpenAI = req.body
-  const fileLoc = `${tempLocalFiles}/${bd.fileName}`
-  const fineTuneFile = await openai.files.create({ file: fs.createReadStream(fileLoc), purpose: 'fine-tune' })
-  fs.unlinkSync(fileLoc)
-  const fineTune = await openai.fineTuning.jobs.create({ training_file: fineTuneFile.id, model: 'gpt-3.5-turbo' })
-  res.json({ fineTuneFile: fineTuneFile, fineTuneJob: fineTune });
+  const trainingFileLoc = `${tempLocalFiles}/${bd.trainingFile}`
+  const fineTuneTrainingFile = await openai.files.create({
+    file: fs.createReadStream(trainingFileLoc),
+    purpose: 'fine-tune'
+  })
+  fs.unlinkSync(trainingFileLoc)
+  let fineTuneValidationFile: OpenAI.Files.FileObject = null
+  if (bd.validationFIle) {
+    const verificationFileLoc = `${tempLocalFiles}/${bd.validationFIle}`
+    fineTuneValidationFile = await openai.files.create({
+      file: fs.createReadStream(verificationFileLoc),
+      purpose: 'fine-tune'
+    })
+    fs.unlinkSync(verificationFileLoc)
+  }
+
+  const fineTune = await openai.fineTuning.jobs.create({
+    training_file: fineTuneTrainingFile.id,
+    validation_file: fineTuneValidationFile !== null ? fineTuneValidationFile.id: undefined,
+    model: 'gpt-3.5-turbo'
+  })
+  res.json({ fineTuneJob: fineTune });
 })

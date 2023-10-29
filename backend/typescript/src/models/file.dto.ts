@@ -1,5 +1,7 @@
 export interface UploadToOpenAI {
-  fileName: string
+  trainingFile: string
+  validationFIle?: string
+  suffix?: string
 }
 
 export interface DeleteFile {
