@@ -2,8 +2,9 @@ import express from 'express'
 import multer from 'multer'
 import * as fs from "fs"
 import OpenAI from 'openai'
-import { DeleteFile, UploadToOpenAI } from "../models/file.dto";
+import { AnalyzeFile, DeleteFile, UploadToOpenAI } from "../models/file.dto";
 import { jsonlFileFilter as fileFilter, readDirSync, storage, tempLocalFiles } from "../utils/multer";
+import { jsonlAnalyze, numTokensFromMessages } from "../services/jsonl-analyze.service";
 
 const upload = multer({
   storage,
@@ -20,12 +21,28 @@ uploadRouter.post("/jsonl", upload.single('file'), async (req, res, next) => {
 
 uploadRouter.post("/jsonl-del", async (req, res, next) => {
   const bd: DeleteFile = req.body
-  console.log("bd", bd)
   bd.fileNames.forEach((e) => {
     const fileLoc = `${tempLocalFiles}/${e}`
     fs.unlinkSync(fileLoc)
   })
   res.json({ success: true })
+})
+uploadRouter.post("/jsonl-analytics", async (req, res, next) => {
+  const analyzeFile: AnalyzeFile = req.body
+  const fileLoc = `${tempLocalFiles}/${analyzeFile.fileName}`
+  try {
+    const fileContent = fs.readFileSync(fileLoc, { encoding: 'utf-8' })
+    const lines = fileContent.split("\n")
+    jsonlAnalyze(lines)
+    const sampleSize = lines.length
+
+    return res.json({
+      sampleSize
+    })
+  } catch (e) {
+    console.error(e)
+    return res.json({ success: false })
+  }
 })
 
 uploadRouter.get("/temp", async (req, res, next) => {

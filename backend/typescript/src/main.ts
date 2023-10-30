@@ -34,7 +34,7 @@ const server = app.listen(port, host, () => {
 });
 
 const onClose = () => {
-  fs.rmSync(tempLocalFiles, { recursive: true, force: true })
+  // fs.rmSync(tempLocalFiles, { recursive: true, force: true })
   console.log(`[ stopped ] http://${host}:${port}`);
   server.close(() => {
     console.log('HTTP server closed')
