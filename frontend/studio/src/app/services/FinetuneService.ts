@@ -47,9 +47,13 @@ export interface JobList {
   page: Page
 }
 
+export interface FinetuneJob {
+  fineTune: Job
+}
+
 interface FinetuneServiceProps {
   list(limit?: number): Promise<JobList>
-  retrieve(id: string): Promise<any>
+  retrieve(id: string): Promise<FinetuneJob>
   cancel(id: string): Promise<any>
   events(id: string, limit?: number): Promise<any>
   del(id: string): Promise<any>

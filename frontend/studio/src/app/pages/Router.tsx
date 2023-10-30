@@ -21,6 +21,13 @@ export const pagesRouter = () => {
         Component: FinetuneHome
       }
     }}/>
+    <Route path="/fine-tune/:id" lazy={async () => {
+      const { FTOverviewHome, ftOverviewHomeLoader } = await import("./ft-overview/FTOverviewHome")
+      return {
+        loader: ftOverviewHomeLoader,
+        Component: FTOverviewHome
+      }
+    }}/>
   </>)
 }
 

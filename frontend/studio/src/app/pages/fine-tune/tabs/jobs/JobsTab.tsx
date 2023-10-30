@@ -20,6 +20,7 @@ import { red, green } from "@mui/material/colors";
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import InsertPageBreakIcon from '@mui/icons-material/InsertPageBreak';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useNavigate } from "react-router-dom";
 
 interface Data extends Row{
   training_file: string
@@ -133,7 +134,7 @@ const CreateJonDialog = (props: CreateJonDialogProps) => {
 }
 
 export const JobsTab = () => {
-  // JobList
+  const navigate = useNavigate()
   const [data, setData] = useState<Data[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [showNewJob, setShowJob] = useState(false)
@@ -267,12 +268,8 @@ export const JobsTab = () => {
   }
 
   const onRowClick = (data: Data) => {
-
+    navigate(`/fine-tune/${data.id}`)
   }
-  const onUploadClick = () => {
-
-  }
-
   return (<>
     <EnhancedTable
       data={data}
