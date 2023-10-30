@@ -51,11 +51,47 @@ export interface FinetuneJob {
   fineTune: Job
 }
 
+export interface EventError {
+  error_code: string
+  error_param: string
+}
+export interface Event {
+  object: string
+  id: string
+  created_at: number
+  level: string
+  message: string
+  data: EventError | {}
+  type: string
+}
+export interface FinetuneEventData {
+  options: {
+    method: string
+    path: string
+    query: {
+      limit: number
+    }
+  };
+  response: {
+    size: number
+    timeout: number
+  };
+  body: {
+    object: string
+    data: Event[]
+    has_more: boolean
+  }
+  data: Event[]
+}
+export interface FinetuneEvent {
+  events: FinetuneEventData
+}
+
 interface FinetuneServiceProps {
   list(limit?: number): Promise<JobList>
   retrieve(id: string): Promise<FinetuneJob>
   cancel(id: string): Promise<any>
-  events(id: string, limit?: number): Promise<any>
+  events(id: string, limit?: number): Promise<FinetuneEvent>
   del(id: string): Promise<any>
 }
 

@@ -208,17 +208,17 @@ export const JobsTab = () => {
             <Switch select={property} otherwise={property}>
               <Case value={"failed"}>
                 <Tooltip title={data.error?.message}>
-                  <ErrorIcon sx={{ color: red[500] ?? "" }}/>
+                  <ErrorIcon fontSize="small" sx={{ color: red[500] ?? "" }}/>
                 </Tooltip>
               </Case>
               <Case value={"validating_files"}>
-                <InsertPageBreakIcon/>
+                <InsertPageBreakIcon fontSize="small" color="action"/>
               </Case>
               <Case value={"running"}>
-                <PlayCircleIcon/>
+                <PlayCircleIcon fontSize="small" color="action"/>
               </Case>
-              <Case value={"success"}>
-                <CheckCircleIcon sx={{ color: green[500] ?? "" }}/>
+              <Case value={"succeeded"}>
+                <CheckCircleIcon fontSize="small" sx={{ color: green[500] ?? "" }}/>
               </Case>
             </Switch>
           </>)

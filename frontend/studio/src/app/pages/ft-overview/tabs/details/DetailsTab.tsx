@@ -61,8 +61,8 @@ export const DetailsTab = () => {
           <Switch select={data.fineTune.status}>
             <Case value="failed">
               <Alert severity="error">
-                <AlertTitle>Something went wrong ({data.fineTune.error?.code}).</AlertTitle>
-                { data.fineTune.error?.message } — <strong>{data.fineTune.error?.param}</strong>
+                <AlertTitle>Something went wrong ({data.fineTune.error?.param}).</AlertTitle>
+                { data.fineTune.error?.message } — <strong>{data.fineTune.error?.code}</strong>
               </Alert>
             </Case>
           </Switch>
