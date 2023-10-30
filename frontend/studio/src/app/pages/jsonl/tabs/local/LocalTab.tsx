@@ -12,6 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import UploadIcon from '@mui/icons-material/Upload';
+import { useNavigate } from "react-router-dom";
 
 interface Data extends Row{
   name: string
@@ -23,6 +24,7 @@ export const LocalTab = () => {
   const inputFileRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState<readonly string[]>([])
+  const navigate = useNavigate()
   // const onDel = (data: Data) => {
   //   console.log("data", data)
   // }
@@ -64,7 +66,6 @@ export const LocalTab = () => {
       })
       setData(dt)
     } catch (error) {
-      console.error(error)
       setData(null)
     }
     setLoading(false)
@@ -108,7 +109,7 @@ export const LocalTab = () => {
   }
 
   const onRowClick = (data: Data) => {
-    console.log("row", data)
+    navigate(`/jsonl/${data.name}`)
   }
 
   const onDeleteMulti = async () => {
