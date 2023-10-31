@@ -11,7 +11,7 @@ import { getEncoding, encodingForModel } from "js-tiktoken"
 import percentile from "percentile"
 
 export const jsonlAnalyze = (values: string[]): AnalyzeReport => {
-  if(values.length >= 10) {
+  if(values.length >= 5) {
     const errorLines: SampleError[] = values.map((e, i) => ({ index: i, errors: jsonlAnalyzeLine(e) }))
       .filter((e) => e.errors !== null)
     if (errorLines.length === 0) {
@@ -28,6 +28,7 @@ export const jsonlAnalyze = (values: string[]): AnalyzeReport => {
       console.log("messageDist", messageDist)
       console.log("tokensDist", tokensDist)
       console.log("assistantTokenDist", assistantTokenDist)
+      costEstimation(values, tokens.map((e) => e.messagesTokensSize))
     }
     return { }
   } else {
@@ -167,4 +168,29 @@ function calculateMedian(values: number[]): number {
 
 function calculatePercentile(values: number[], nPercentile: number): number {
   return <number>percentile(nPercentile, values)
+}
+
+const costEstimation = (values: string[], messagesTokensSize: number[]) => {
+  // https://openai.com/pricing
+  const MAX_TOKENS_PER_EXAMPLE = 4096
+  const TARGET_EPOCHS = 3
+  const MIN_TARGET_EXAMPLES = 100
+  const MAX_TARGET_EXAMPLES = 25000
+  const MIN_DEFAULT_EPOCHS = 1
+  const MAX_DEFAULT_EPOCHS = 25
+  const TRAINING_TOKENS = 0.0080
+  let nEpochs = TARGET_EPOCHS
+  const nTrainSamples = values.length
+  if(nTrainSamples * TARGET_EPOCHS < MIN_TARGET_EXAMPLES) {
+    nEpochs = Math.min(MAX_DEFAULT_EPOCHS, Math.floor(MIN_TARGET_EXAMPLES / nTrainSamples))
+  } else if (nTrainSamples * TARGET_EPOCHS > MAX_TARGET_EXAMPLES) {
+    nEpochs = Math.max(MIN_DEFAULT_EPOCHS, Math.floor(MAX_TARGET_EXAMPLES / nTrainSamples))
+  }
+  const nBillingTokensInDataset: number = messagesTokensSize.reduce((total, length) => total + Math.min(MAX_TOKENS_PER_EXAMPLE, length), 0)
+  const totalTokens = nEpochs * nBillingTokensInDataset
+  const costEstimation = (TRAINING_TOKENS * totalTokens) / 1000
+  console.log(`Dataset has ~${nBillingTokensInDataset} tokens that will be charged for during training`);
+  console.log(`By default, you'll train for ${nEpochs} epochs on this dataset`);
+  console.log(`By default, you'll be charged for ~${totalTokens} tokens`);
+  console.log(`Cost Estimation $${costEstimation} USD`);
 }
