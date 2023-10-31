@@ -1,11 +1,24 @@
 import { Errors, Message, Sample, SampleError, SampleTokens } from "../models/fine-tune.dto";
 import { getEncoding, encodingForModel } from "js-tiktoken"
+import percentile from "percentile"
 
 export const jsonlAnalyze = (values: string[]) => {
   const errorLines: SampleError[] = values.map((e, i) => ({ index: i, errors: jsonlAnalyzeLine(e) }))
     .filter((e) => e.errors !== null)
   const tokens: SampleTokens[] = values.map((e, i) => jsonlTokenCountLine(i, e))
-  console.log("tokens", tokens)
+  distribution(
+    tokens.map((e) => e.nMessages),
+    "num_messages_per_example"
+  )
+  distribution(
+    tokens.map((e) => e.messagesTokensSize),
+    "num_total_tokens_per_example"
+  )
+  distribution(
+    tokens.map((e) => e.assistantMessageLen),
+    "num_assistant_tokens_per_example"
+  )
+
 }
 
 export const jsonlAnalyzeLine = (values: string): Errors | null => {
@@ -111,8 +124,8 @@ export const distribution = (values: number[], name: string) => {
   const max = Math.max(...values);
   const mean = calculateMean(values);
   const median = calculateMedian(values);
-  const p5 = calculatePercentile(values, 0.05);
-  const p95 = calculatePercentile(values, 0.95);
+  const p5 = calculatePercentile(values, 10);
+  const p95 = calculatePercentile(values, 90);
 
   console.log(`\n#### Distribution of ${name}:`);
   console.log(`min / max: ${min}, ${max}`);
@@ -134,8 +147,6 @@ function calculateMedian(values: number[]): number {
   return sortedValues[middle];
 }
 
-function calculatePercentile(values: number[], percentile: number): number {
-  const sortedValues = values.slice().sort((a, b) => a - b);
-  const index = Math.floor(percentile * (sortedValues.length - 1));
-  return sortedValues[index];
+function calculatePercentile(values: number[], nPercentile: number): number {
+  return <number>percentile(nPercentile, values)
 }
