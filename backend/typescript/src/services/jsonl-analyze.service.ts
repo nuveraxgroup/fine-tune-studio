@@ -7,16 +7,13 @@ export const jsonlAnalyze = (values: string[]) => {
     .filter((e) => e.errors !== null)
   const tokens: SampleTokens[] = values.map((e, i) => jsonlTokenCountLine(i, e))
   const messageDist = distribution(
-    tokens.map((e) => e.nMessages),
-    "num_messages_per_example"
+    tokens.map((e) => e.nMessages)
   )
   const tokensDist = distribution(
-    tokens.map((e) => e.messagesTokensSize),
-    "num_total_tokens_per_example"
+    tokens.map((e) => e.messagesTokensSize)
   )
   const assistantTokenDist = distribution(
-    tokens.map((e) => e.assistantMessageLen),
-    "num_assistant_tokens_per_example"
+    tokens.map((e) => e.assistantMessageLen)
   )
   console.log("messageDist", messageDist)
   console.log("tokensDist", tokensDist)
@@ -121,7 +118,7 @@ export const numAssistantTokensFromMessages = (messages: Message[]): number => {
   return numTokens
 }
 
-export const distribution = (values: number[], name: string): Distribution => {
+export const distribution = (values: number[]): Distribution => {
   const min = Math.min(...values);
   const max = Math.max(...values);
   const mean = calculateMean(values);
