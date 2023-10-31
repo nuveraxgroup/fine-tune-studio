@@ -1,23 +1,39 @@
-import { Distribution, Errors, Message, Sample, SampleError, SampleTokens } from "../models/fine-tune.dto";
+import {
+  AnalyzeReport,
+  Distribution,
+  Errors,
+  Message,
+  Sample,
+  SampleError,
+  SampleTokens
+} from "../models/fine-tune.dto";
 import { getEncoding, encodingForModel } from "js-tiktoken"
 import percentile from "percentile"
 
-export const jsonlAnalyze = (values: string[]) => {
-  const errorLines: SampleError[] = values.map((e, i) => ({ index: i, errors: jsonlAnalyzeLine(e) }))
-    .filter((e) => e.errors !== null)
-  const tokens: SampleTokens[] = values.map((e, i) => jsonlTokenCountLine(i, e))
-  const messageDist = distribution(
-    tokens.map((e) => e.nMessages)
-  )
-  const tokensDist = distribution(
-    tokens.map((e) => e.messagesTokensSize)
-  )
-  const assistantTokenDist = distribution(
-    tokens.map((e) => e.assistantMessageLen)
-  )
-  console.log("messageDist", messageDist)
-  console.log("tokensDist", tokensDist)
-  console.log("assistantTokenDist", assistantTokenDist)
+export const jsonlAnalyze = (values: string[]): AnalyzeReport => {
+  if(values.length >= 10) {
+    const errorLines: SampleError[] = values.map((e, i) => ({ index: i, errors: jsonlAnalyzeLine(e) }))
+      .filter((e) => e.errors !== null)
+    if (errorLines.length === 0) {
+      const tokens: SampleTokens[] = values.map((e, i) => jsonlTokenCountLine(i, e))
+      const messageDist = distribution(
+        tokens.map((e) => e.nMessages)
+      )
+      const tokensDist = distribution(
+        tokens.map((e) => e.messagesTokensSize)
+      )
+      const assistantTokenDist = distribution(
+        tokens.map((e) => e.assistantMessageLen)
+      )
+      console.log("messageDist", messageDist)
+      console.log("tokensDist", tokensDist)
+      console.log("assistantTokenDist", assistantTokenDist)
+    }
+    return { }
+  } else {
+    // throw error if the have lass that 10 samples on the file
+    return { }
+  }
 }
 
 export const jsonlAnalyzeLine = (values: string): Errors | null => {

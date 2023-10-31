@@ -35,3 +35,7 @@ export interface Distribution {
   p1: number
   p90: number
 }
+
+export interface AnalyzeReport {
+
+}
