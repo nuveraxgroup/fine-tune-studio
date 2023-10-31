@@ -1,4 +1,4 @@
-import { Errors, Message, Sample, SampleError, SampleTokens } from "../models/fine-tune.dto";
+import { Distribution, Errors, Message, Sample, SampleError, SampleTokens } from "../models/fine-tune.dto";
 import { getEncoding, encodingForModel } from "js-tiktoken"
 import percentile from "percentile"
 
@@ -6,19 +6,21 @@ export const jsonlAnalyze = (values: string[]) => {
   const errorLines: SampleError[] = values.map((e, i) => ({ index: i, errors: jsonlAnalyzeLine(e) }))
     .filter((e) => e.errors !== null)
   const tokens: SampleTokens[] = values.map((e, i) => jsonlTokenCountLine(i, e))
-  distribution(
+  const messageDist = distribution(
     tokens.map((e) => e.nMessages),
     "num_messages_per_example"
   )
-  distribution(
+  const tokensDist = distribution(
     tokens.map((e) => e.messagesTokensSize),
     "num_total_tokens_per_example"
   )
-  distribution(
+  const assistantTokenDist = distribution(
     tokens.map((e) => e.assistantMessageLen),
     "num_assistant_tokens_per_example"
   )
-
+  console.log("messageDist", messageDist)
+  console.log("tokensDist", tokensDist)
+  console.log("assistantTokenDist", assistantTokenDist)
 }
 
 export const jsonlAnalyzeLine = (values: string): Errors | null => {
@@ -119,18 +121,21 @@ export const numAssistantTokensFromMessages = (messages: Message[]): number => {
   return numTokens
 }
 
-export const distribution = (values: number[], name: string) => {
+export const distribution = (values: number[], name: string): Distribution => {
   const min = Math.min(...values);
   const max = Math.max(...values);
   const mean = calculateMean(values);
   const median = calculateMedian(values);
-  const p5 = calculatePercentile(values, 10);
-  const p95 = calculatePercentile(values, 90);
-
-  console.log(`\n#### Distribution of ${name}:`);
-  console.log(`min / max: ${min}, ${max}`);
-  console.log(`mean / median: ${mean}, ${median}`);
-  console.log(`p5 / p95: ${p5}, ${p95}`);
+  const p1 = calculatePercentile(values, 10);
+  const p90 = calculatePercentile(values, 90);
+  return {
+    min,
+    max,
+    mean,
+    median,
+    p1,
+    p90
+  }
 }
 
 function calculateMean(values: number[]): number {

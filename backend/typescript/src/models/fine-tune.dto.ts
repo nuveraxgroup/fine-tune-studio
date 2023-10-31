@@ -26,3 +26,12 @@ export interface SampleTokens {
   nTooLong: boolean
   assistantMessageLen: number
 }
+
+export interface Distribution {
+  min: number
+  max: number
+  mean: number
+  median: number
+  p1: number
+  p90: number
+}
