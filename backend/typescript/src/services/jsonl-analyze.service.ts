@@ -11,7 +11,7 @@ import { getEncoding, encodingForModel } from "js-tiktoken"
 import percentile from "percentile"
 
 export const jsonlAnalyze = (values: string[]): AnalyzeReport => {
-  if(values.length >= 10) {
+  if(values.length >= 5) {
     const errorLines: SampleError[] = values.map((e, i) => ({ index: i, errors: jsonlAnalyzeLine(e) }))
       .filter((e) => e.errors !== null)
     if (errorLines.length === 0) {
