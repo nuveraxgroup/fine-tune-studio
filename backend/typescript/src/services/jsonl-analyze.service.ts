@@ -105,8 +105,8 @@ export const jsonlTokenCountLine = (index: number,values: string): SampleTokens 
   const assistantMessageLen = numAssistantTokensFromMessages(toJsonValues.messages)
   return {
     index,
-    nMissingSystem,
-    nMissingUser,
+    nMissingSystem: nMissingSystem === 0 ? undefined: nMissingSystem,
+    nMissingUser: nMissingUser === 0 ? undefined: nMissingUser,
     nMessages,
     messagesTokensSize,
     nTooLong: messagesTokensSize > 4096,

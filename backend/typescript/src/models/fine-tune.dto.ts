@@ -23,7 +23,7 @@ export interface SampleError {
 
 export interface SampleTokens {
   index: number
-  nMissingSystem: number
+  nMissingSystem?: number
   nMissingUser: number
   nMessages: number
   messagesTokensSize: number
