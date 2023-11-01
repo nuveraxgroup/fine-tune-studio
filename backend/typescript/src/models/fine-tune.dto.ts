@@ -8,13 +8,17 @@ export interface Sample {
   messages: Message[]
 }
 
-export interface Errors {
+export interface Error {
   [key: string]: number
+}
+
+export interface ErrorFile {
+  [key: string]: string
 }
 
 export interface SampleError {
   index: number
-  errors: Errors
+  errors: Error
 }
 
 export interface SampleTokens {
@@ -37,5 +41,19 @@ export interface Distribution {
 }
 
 export interface AnalyzeReport {
+  samples: number,
+  errorLines?: SampleError[]
+  tokens?: SampleTokens[],
+  messageDistribution?: Distribution
+  tokensDistribution?: Distribution
+  assistantTokenDistribution?: Distribution,
+  costEstimation?: CostEstimation,
+  errors?: ErrorFile[]
+}
 
+export interface CostEstimation {
+  nBillingTokensInDataset: number
+  nEpochs: number
+  totalTokens: number
+  costEstimation: number
 }

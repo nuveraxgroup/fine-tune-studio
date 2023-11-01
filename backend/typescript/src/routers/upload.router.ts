@@ -33,11 +33,9 @@ uploadRouter.post("/jsonl-analytics", async (req, res, next) => {
   try {
     const fileContent = fs.readFileSync(fileLoc, { encoding: 'utf-8' })
     const lines = fileContent.split("\n")
-    jsonlAnalyze(lines)
-    const sampleSize = lines.length
-
+    const report = jsonlAnalyze(lines)
     return res.json({
-      sampleSize
+      report
     })
   } catch (e) {
     console.error(e)

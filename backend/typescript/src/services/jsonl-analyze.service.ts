@@ -1,7 +1,7 @@
 import {
-  AnalyzeReport,
+  AnalyzeReport, CostEstimation,
   Distribution,
-  Errors,
+  Error,
   Message,
   Sample,
   SampleError,
@@ -11,7 +11,7 @@ import { getEncoding, encodingForModel } from "js-tiktoken"
 import percentile from "percentile"
 
 export const jsonlAnalyze = (values: string[]): AnalyzeReport => {
-  if(values.length >= 5) {
+  if(values.length >= 10) {
     const errorLines: SampleError[] = values.map((e, i) => ({ index: i, errors: jsonlAnalyzeLine(e) }))
       .filter((e) => e.errors !== null)
     if (errorLines.length === 0) {
@@ -25,20 +25,35 @@ export const jsonlAnalyze = (values: string[]): AnalyzeReport => {
       const assistantTokenDist = distribution(
         tokens.map((e) => e.assistantMessageLen)
       )
-      console.log("messageDist", messageDist)
-      console.log("tokensDist", tokensDist)
-      console.log("assistantTokenDist", assistantTokenDist)
-      costEstimation(values, tokens.map((e) => e.messagesTokensSize))
+      const estimation = costEstimation(values, tokens.map((e) => e.messagesTokensSize))
+      return {
+        samples: values.length,
+        tokens,
+        messageDistribution: messageDist,
+        tokensDistribution: tokensDist,
+        assistantTokenDistribution: assistantTokenDist,
+        costEstimation: estimation
+      }
     }
-    return { }
+    return {
+      samples: values.length,
+      errorLines
+    }
   } else {
     // throw error if the have lass that 10 samples on the file
-    return { }
+    return {
+      samples: values.length,
+      errors: [
+        {
+          "n_samples": `Min number of samples allowed "10"`
+        }
+      ]
+    }
   }
 }
 
-export const jsonlAnalyzeLine = (values: string): Errors | null => {
-  const formatErrors: Errors = {};
+export const jsonlAnalyzeLine = (values: string): Error | null => {
+  const formatErrors: Error = {};
   try {
     const toJsonValues: any = JSON.parse(values)
     if (typeof toJsonValues !== 'object') {
@@ -170,7 +185,7 @@ function calculatePercentile(values: number[], nPercentile: number): number {
   return <number>percentile(nPercentile, values)
 }
 
-const costEstimation = (values: string[], messagesTokensSize: number[]) => {
+const costEstimation = (values: string[], messagesTokensSize: number[]): CostEstimation => {
   // https://openai.com/pricing
   const MAX_TOKENS_PER_EXAMPLE = 4096
   const TARGET_EPOCHS = 3
@@ -193,4 +208,10 @@ const costEstimation = (values: string[], messagesTokensSize: number[]) => {
   console.log(`By default, you'll train for ${nEpochs} epochs on this dataset`);
   console.log(`By default, you'll be charged for ~${totalTokens} tokens`);
   console.log(`Cost Estimation $${costEstimation} USD`);
+  return {
+    nBillingTokensInDataset,
+    nEpochs,
+    totalTokens,
+    costEstimation
+  }
 }
