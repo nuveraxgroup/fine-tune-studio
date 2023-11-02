@@ -1,3 +1,4 @@
+import { ReportResponse } from "../model/upload.model";
 
 export interface FilesInfo {
   file: File
@@ -5,6 +6,10 @@ export interface FilesInfo {
 
 export interface DeleteFile {
   fileNames: string[]
+}
+
+export interface AnalyzeFile {
+  fileName: string
 }
 
 export interface UploadToOpenAI {
@@ -45,6 +50,21 @@ export const uploadService = (): UploadServiceProps => {
 
   const jsonlDel = async (data: DeleteFile): Promise<any> => {
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/upload/jsonl-del`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+        // "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(data),
+    })
+    if (response.ok) {
+      return await response.json()
+    }
+    return Promise.reject(new Error("Error"))
+  }
+
+  const jsonlAnalytics = async (data: AnalyzeFile): Promise<ReportResponse> => {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/upload/jsonl-analytics`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json; charset=utf-8"

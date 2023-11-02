@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Grid, IconButton, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { JsonOverviewTabs } from "./tabs/JsonOverviewTabs";
 
 export const JsonlOverviewHome = () => {
   const params = useParams()
@@ -33,7 +34,7 @@ export const JsonlOverviewHome = () => {
         </Typography>
       </Grid>
     </Grid>
-
+    <JsonOverviewTabs/>
 
   </Grid>)
 }
