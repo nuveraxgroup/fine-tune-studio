@@ -1,7 +1,30 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { ReportResponse } from "../../../../model/upload.model";
 import Grid from '@mui/material/Grid';
-import { Card, CardActions, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
+import { NumericFormat } from 'react-number-format';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import TokenIcon from '@mui/icons-material/Token';
+import DatasetIcon from '@mui/icons-material/Dataset';
+import NumbersIcon from '@mui/icons-material/Numbers';
+import { LabelValueProps } from "../../../ft-overview/tabs/details/DetailsTab";
+import { If } from "../../../../@core";
+import * as React from "react";
+
+export interface LabelValueProps{
+  label: ReactNode
+  children?: ReactNode
+}
+export const LabelValue = (props: LabelValueProps) => {
+  return (<>
+    <Typography sx={{ marginBottom: "10px" }} variant="caption" color="text.secondary">
+      {props.label}
+    </Typography>
+    <Typography sx={{ marginBottom: "10px" }}>
+      {props.children}
+    </Typography>
+  </>)
+}
 
 export const DetailsTab = () => {
   const [data, setData] = useState<ReportResponse>(JSON.parse(`{
@@ -80,24 +103,36 @@ export const DetailsTab = () => {
 }`))
 
   return (<>
-    <Typography sx={{ my: 2 }} variant="h5">
-      Details
-    </Typography>
     <Grid container
           spacing={2}>
       <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
       <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
-
+        <Typography sx={{ my: 2 }} variant="h5">
+          Cost
+        </Typography>
         <Grid container
               spacing={2}>
-          <Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+          <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
             <Card variant="outlined">
               <CardContent>
-                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                  Cost Estimation
-                </Typography>
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Grid item>
+                    <AttachMoneyIcon fontSize="small" color="action"/>
+                  </Grid>
+                  <Grid item>
+                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                      Cost Estimation
+                    </Typography>
+                  </Grid>
+                </Grid>
                 <Typography sx={{ fontSize: "1.7rem", fontWeight: 400 }} variant="currency" component="span">
-                  ${data.report.costEstimation?.costEstimation}
+                  <NumericFormat value={data.report.costEstimation?.costEstimation} displayType={'text'} decimalScale={2} thousandSeparator={true} prefix={'$'} />
                 </Typography>
                 <Typography sx={{ mb: 1.5 }} component="span" color="text.secondary">
                   {" "}USD
@@ -105,32 +140,112 @@ export const DetailsTab = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+          <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
             <Card variant="outlined">
               <CardContent>
-                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                  Total Tokens
-                </Typography>
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Grid item>
+                    <TokenIcon fontSize="small" color="action"/>
+                  </Grid>
+                  <Grid item>
+                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                      Total Tokens
+                    </Typography>
+                  </Grid>
+                </Grid>
                 <Typography variant="h5" component="div">
-                  {data.report.costEstimation?.totalTokens}
+                  <NumericFormat
+                    value={data.report.costEstimation?.totalTokens}
+                    displayType={'text'}
+                    thousandSeparator={true} />
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
+          <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
             <Card variant="outlined">
               <CardContent>
-                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                  Dataset Tokens
-                </Typography>
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Grid item>
+                    <DatasetIcon fontSize="small" color="action"/>
+                  </Grid>
+                  <Grid item>
+                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                      Dataset Tokens
+                    </Typography>
+                  </Grid>
+                </Grid>
                 <Typography variant="h5" component="div">
-                  {data.report.costEstimation?.nBillingTokensInDataset}
+                  <NumericFormat
+                    value={data.report.costEstimation?.nBillingTokensInDataset}
+                    displayType={'text'}
+                    thousandSeparator={true} />
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
+            <Card variant="outlined">
+              <CardContent>
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Grid item>
+                    <NumbersIcon fontSize="small" color="action"/>
+                  </Grid>
+                  <Grid item>
+                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                      Epochs
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Typography variant="h5" component="div">
+                  <NumericFormat
+                    value={data.report.costEstimation?.nEpochs}
+                    displayType={'text'}
+                    thousandSeparator={true} />
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
 
+      </Grid>
+      <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+
+      <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+      <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
+        <Typography sx={{ my: 2 }} variant="h5">
+          Tokens
+        </Typography>
+        <Card>
+          <CardContent>
+            <Grid container
+                  spacing={2}>
+              <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                <LabelValue label="# Mensages">
+                  { data.report?.tokens[0].nMessages }
+                </LabelValue>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
       </Grid>
       <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
     </Grid>
