@@ -1,15 +1,27 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, MouseEvent } from "react";
 import { ReportResponse } from "../../../../model/upload.model";
 import Grid from '@mui/material/Grid';
-import { Card, CardContent, Typography } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Card,
+  CardContent,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Typography,
+} from '@mui/material';
 import { NumericFormat } from 'react-number-format';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TokenIcon from '@mui/icons-material/Token';
 import DatasetIcon from '@mui/icons-material/Dataset';
 import NumbersIcon from '@mui/icons-material/Numbers';
-import { LabelValueProps } from "../../../ft-overview/tabs/details/DetailsTab";
-import { If } from "../../../../@core";
 import * as React from "react";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import DeblurIcon from '@mui/icons-material/Deblur'
+import { HistogramDist } from "../../../../component/HistogramDist";
 
 export interface LabelValueProps{
   label: ReactNode
@@ -25,7 +37,7 @@ export const LabelValue = (props: LabelValueProps) => {
     </Typography>
   </>)
 }
-
+const dataDist = [1, 2, 2, 2, 3, 4, 5, 6, 6, 6, 9]
 export const DetailsTab = () => {
   const [data, setData] = useState<ReportResponse>(JSON.parse(`{
     "report": {
@@ -102,152 +114,312 @@ export const DetailsTab = () => {
     }
 }`))
 
+  const [sampleIndex, setSampleIndex] = useState(0)
+  const [anchorIndexMenu, setAnchorIndexMenu] = useState<null | HTMLElement>(null)
+
+  const onChangeSampleIndex = (index: number) => {
+    setSampleIndex(index)
+    onCloseIndexMenu()
+  }
+
+  const onOpenIndexMenu = (event: MouseEvent<HTMLElement>) => {
+    setAnchorIndexMenu(event.currentTarget)
+  }
+
+  const onCloseIndexMenu = () => {
+    setAnchorIndexMenu(null)
+  }
+
   return (<>
     <Grid container
           spacing={2}>
-      <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-      <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
-        <Typography sx={{ my: 2 }} variant="h5">
-          Cost
-        </Typography>
-        <Grid container
-              spacing={2}>
-          <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
-            <Card variant="outlined">
-              <CardContent>
-                <Grid
-                  container
-                  direction="row"
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Grid item>
-                    <AttachMoneyIcon fontSize="small" color="action"/>
-                  </Grid>
-                  <Grid item>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                      Cost Estimation
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Typography sx={{ fontSize: "1.7rem", fontWeight: 400 }} variant="currency" component="span">
-                  <NumericFormat value={data.report.costEstimation?.costEstimation} displayType={'text'} decimalScale={2} thousandSeparator={true} prefix={'$'} />
-                </Typography>
-                <Typography sx={{ mb: 1.5 }} component="span" color="text.secondary">
-                  {" "}USD
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
-            <Card variant="outlined">
-              <CardContent>
-                <Grid
-                  container
-                  direction="row"
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Grid item>
-                    <TokenIcon fontSize="small" color="action"/>
-                  </Grid>
-                  <Grid item>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                      Total Tokens
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Typography variant="h5" component="div">
-                  <NumericFormat
-                    value={data.report.costEstimation?.totalTokens}
-                    displayType={'text'}
-                    thousandSeparator={true} />
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
-            <Card variant="outlined">
-              <CardContent>
-                <Grid
-                  container
-                  direction="row"
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Grid item>
-                    <DatasetIcon fontSize="small" color="action"/>
-                  </Grid>
-                  <Grid item>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                      Dataset Tokens
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Typography variant="h5" component="div">
-                  <NumericFormat
-                    value={data.report.costEstimation?.nBillingTokensInDataset}
-                    displayType={'text'}
-                    thousandSeparator={true} />
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
-            <Card variant="outlined">
-              <CardContent>
-                <Grid
-                  container
-                  direction="row"
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Grid item>
-                    <NumbersIcon fontSize="small" color="action"/>
-                  </Grid>
-                  <Grid item>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                      Epochs
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Typography variant="h5" component="div">
-                  <NumericFormat
-                    value={data.report.costEstimation?.nEpochs}
-                    displayType={'text'}
-                    thousandSeparator={true} />
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-      </Grid>
-      <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-
-      <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-      <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
-        <Typography sx={{ my: 2 }} variant="h5">
-          Tokens
-        </Typography>
-        <Card>
-          <CardContent>
+      {data.report?.costEstimation &&
+        <>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+          <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
+            <Typography sx={{ my: 2 }} variant="h5">
+              Cost
+            </Typography>
             <Grid container
                   spacing={2}>
-              <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
-                <LabelValue label="# Mensages">
-                  { data.report?.tokens[0].nMessages }
-                </LabelValue>
+              <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Grid
+                      container
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      spacing={1}
+                    >
+                      <Grid item>
+                        <AttachMoneyIcon fontSize="small" color="action"/>
+                      </Grid>
+                      <Grid item>
+                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                          Cost Estimation
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography sx={{ fontSize: "1.7rem", fontWeight: 400 }} variant="currency" component="span">
+                      <NumericFormat value={data.report.costEstimation?.costEstimation} displayType={'text'} decimalScale={2} thousandSeparator={true} prefix={'$'} />
+                    </Typography>
+                    <Typography sx={{ mb: 1.5 }} component="span" color="text.secondary">
+                      {" "}USD
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Grid
+                      container
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      spacing={1}
+                    >
+                      <Grid item>
+                        <TokenIcon fontSize="small" color="action"/>
+                      </Grid>
+                      <Grid item>
+                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                          Total Tokens
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="h5" component="div">
+                      <NumericFormat
+                        value={data.report.costEstimation?.totalTokens}
+                        displayType={'text'}
+                        thousandSeparator={true} />
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Grid
+                      container
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      spacing={1}
+                    >
+                      <Grid item>
+                        <DatasetIcon fontSize="small" color="action"/>
+                      </Grid>
+                      <Grid item>
+                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                          Dataset Tokens
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="h5" component="div">
+                      <NumericFormat
+                        value={data.report.costEstimation?.nBillingTokensInDataset}
+                        displayType={'text'}
+                        thousandSeparator={true} />
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Grid
+                      container
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      spacing={1}
+                    >
+                      <Grid item>
+                        <DeblurIcon fontSize="small" color="action"/>
+                      </Grid>
+                      <Grid item>
+                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                          Samples
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="h5" component="div">
+                      <NumericFormat
+                        value={data.report.samples}
+                        displayType={'text'}
+                        thousandSeparator={true} />
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6} md={6} lg={4} xl={4}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Grid
+                      container
+                      direction="row"
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      spacing={1}
+                    >
+                      <Grid item>
+                        <NumbersIcon fontSize="small" color="action"/>
+                      </Grid>
+                      <Grid item>
+                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                          Epochs
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="h5" component="div">
+                      <NumericFormat
+                        value={data.report.costEstimation?.nEpochs}
+                        displayType={'text'}
+                        thousandSeparator={true} />
+                    </Typography>
+                  </CardContent>
+                </Card>
               </Grid>
             </Grid>
-          </CardContent>
-        </Card>
-      </Grid>
-      <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+          </Grid>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+        </>
+      }
+      {data.report?.tokens && data.report?.tokens.length > 0 &&
+        <>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+          <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
+            <Typography sx={{ my: 2 }} variant="h5">
+              Tokens
+            </Typography>
+            <Button startIcon={<DeblurIcon />}
+                    endIcon={<KeyboardArrowDownIcon />}
+                    onClick={onOpenIndexMenu}
+            >
+              Sample: #{sampleIndex + 1}
+            </Button>
+            <Menu anchorEl={anchorIndexMenu}
+                  onClose={onCloseIndexMenu}
+                  open={Boolean(anchorIndexMenu)}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  slotProps={{
+                    paper: {
+                      style: {
+                        maxHeight: "200px"
+                      }
+                    }
+                  }}>
+              {data.report?.tokens.map((e, i) => (
+                <MenuItem key={i}
+                          selected={i === sampleIndex}
+                          onClick={() => onChangeSampleIndex(i)}>
+                  <ListItemIcon>
+                    <DeblurIcon />
+                  </ListItemIcon>
+                  <ListItemText>
+                    Sample #{i + 1}
+                  </ListItemText>
+                </MenuItem>
+              ))
+              }
+            </Menu>
+            {data.report?.tokens[sampleIndex].nTooLong &&
+              <Alert severity="error">
+                <AlertTitle>
+                  Sample too long
+                </AlertTitle>
+                Max sample size 4,096
+              </Alert>
+            }
+            {data.report?.tokens[sampleIndex].nMissingSystem &&
+              <Alert severity="error">
+                <AlertTitle>
+                  Missing system messages
+                </AlertTitle>
+                { data.report?.tokens[sampleIndex].nMissingSystem } missing system messages
+              </Alert>
+            }
+            {data.report?.tokens[sampleIndex].nMissingUser &&
+              <Alert severity="error">
+                <AlertTitle>
+                  Missing user messages
+                </AlertTitle>
+                { data.report?.tokens[sampleIndex].nMissingUser } missing user messages
+              </Alert>
+            }
+            <Card>
+              <CardContent>
+                <Grid container
+                      spacing={2}>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="# Messages">
+                      { data.report?.tokens[sampleIndex].nMessages }
+                    </LabelValue>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="Total Tokens">
+                      { data.report?.tokens[sampleIndex].messagesTokensSize }
+                    </LabelValue>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="Assistant Tokens">
+                      { data.report?.tokens[sampleIndex].assistantMessageLen }
+                    </LabelValue>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+        </>
+      }
+      {data.report?.messageDistribution &&
+        <>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+          <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
+            <Typography sx={{ my: 2 }} variant="h5">
+              Messages Distribution Histogram
+            </Typography>
+            <HistogramDist
+              median={1}
+              data={(data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.nMessages))}
+              width={500}
+              height={300}/>
+          </Grid>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+        </>
+      }
+      {data.report?.tokensDistribution &&
+        <>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+          <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
+            <Typography sx={{ my: 2 }} variant="h5">
+              Tokens Distribution Histogram
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+        </>
+      }
+      {data.report?.assistantTokenDistribution &&
+        <>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+          <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
+            <Typography sx={{ my: 2 }} variant="h5">
+              Assistant Distribution Histogram
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+        </>
+      }
     </Grid>
   </>)
 }
