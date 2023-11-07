@@ -21,7 +21,8 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import * as React from "react";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import DeblurIcon from '@mui/icons-material/Deblur'
-import { HistogramDist } from "../../../../component/HistogramDist";
+import Plot from 'react-plotly.js'
+import BarChartIcon from '@mui/icons-material/BarChart'
 
 export interface LabelValueProps{
   label: ReactNode
@@ -37,7 +38,9 @@ export const LabelValue = (props: LabelValueProps) => {
     </Typography>
   </>)
 }
-const dataDist = [1, 2, 2, 2, 3, 4, 5, 6, 6, 6, 9]
+const histogramMenu = [
+  {  }
+]
 export const DetailsTab = () => {
   const [data, setData] = useState<ReportResponse>(JSON.parse(`{
     "report": {
@@ -116,6 +119,7 @@ export const DetailsTab = () => {
 
   const [sampleIndex, setSampleIndex] = useState(0)
   const [anchorIndexMenu, setAnchorIndexMenu] = useState<null | HTMLElement>(null)
+  const [anchorHistogramMenu, setAnchorHistogramMenu] = useState<null | HTMLElement>(null)
 
   const onChangeSampleIndex = (index: number) => {
     setSampleIndex(index)
@@ -126,8 +130,16 @@ export const DetailsTab = () => {
     setAnchorIndexMenu(event.currentTarget)
   }
 
+  const onOpenHistogramMenu = (event: MouseEvent<HTMLElement>) => {
+    setAnchorHistogramMenu(event.currentTarget)
+  }
+
   const onCloseIndexMenu = () => {
     setAnchorIndexMenu(null)
+  }
+
+  const onCloseHistogramMenu = () => {
+    setAnchorHistogramMenu(null)
   }
 
   return (<>
@@ -387,13 +399,50 @@ export const DetailsTab = () => {
           <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
           <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
             <Typography sx={{ my: 2 }} variant="h5">
-              Messages Distribution Histogram
+              Messages
             </Typography>
-            <HistogramDist
-              median={1}
-              data={(data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.nMessages))}
-              width={500}
-              height={300}/>
+            <Button startIcon={<BarChartIcon />}
+                    endIcon={<KeyboardArrowDownIcon />}
+                    onClick={onOpenHistogramMenu}
+            >
+              Histogram
+            </Button>
+            <Menu anchorEl={anchorHistogramMenu}
+                  onClose={onCloseHistogramMenu}
+                  open={Boolean(anchorHistogramMenu)}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  slotProps={{
+                    paper: {
+                      style: {
+                        maxHeight: "200px"
+                      }
+                    }
+                  }}>
+            </Menu>
+            <Card>
+              <CardContent>
+                <Plot
+                  data={[
+                    {
+                      x: (data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.nMessages)),
+                      type: 'histogram'
+                    }
+                  ]}
+                  layout={ {
+                    title: 'Distribution Histogram',
+                    xaxis: {title: "Messages Count"},
+                    yaxis: {title: "Frecuency"}
+                  } }
+                />
+              </CardContent>
+            </Card>
           </Grid>
           <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
         </>
@@ -403,8 +452,21 @@ export const DetailsTab = () => {
           <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
           <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
             <Typography sx={{ my: 2 }} variant="h5">
-              Tokens Distribution Histogram
+              Message Tokens
             </Typography>
+            <Plot
+              data={[
+                {
+                  x: (data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.messagesTokensSize)),
+                  type: 'histogram'
+                }
+              ]}
+              layout={ {
+                title: 'Distribution Histogram',
+                xaxis: {title: "Message Tokens"},
+                yaxis: {title: "Frecuency"}
+              } }
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
         </>
@@ -414,8 +476,21 @@ export const DetailsTab = () => {
           <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
           <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
             <Typography sx={{ my: 2 }} variant="h5">
-              Assistant Distribution Histogram
+              Assistant Tokens
             </Typography>
+            <Plot
+              data={[
+                {
+                  x: (data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.assistantMessageLen)),
+                  type: 'histogram'
+                }
+              ]}
+              layout={ {
+                title: 'Distribution Histogram',
+                xaxis: {title: "Assistant Tokens"},
+                yaxis: {title: "Frecuency"}
+              } }
+            />
           </Grid>
           <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
         </>
