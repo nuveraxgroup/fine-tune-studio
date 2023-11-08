@@ -460,7 +460,7 @@ export const DetailsTab = () => {
                       selected={e.value === histogramSelection.value}
                       onClick={() => onChangeHistogramSelection(e)}>
               <ListItemIcon>
-                <DeblurIcon />
+                <BarChartIcon />
               </ListItemIcon>
               <ListItemText>
                 { e.label }
