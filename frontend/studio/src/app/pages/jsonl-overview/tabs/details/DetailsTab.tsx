@@ -1,5 +1,5 @@
 import { ReactNode, useState, MouseEvent } from "react";
-import { ReportResponse } from "../../../../model/upload.model";
+import { Distribution, ReportResponse } from "../../../../model/upload.model";
 import Grid from '@mui/material/Grid';
 import {
   Alert,
@@ -38,8 +38,14 @@ export const LabelValue = (props: LabelValueProps) => {
     </Typography>
   </>)
 }
-const histogramMenu = [
-  {  }
+interface Option {
+  label: string
+  value: string
+}
+const histogramMenu: Option[] = [
+  { label: "Messages Count", value: "messages" },
+  { label: "Message Tokens", value: "token" },
+  { label: "Assistant Tokens", value: "assistant-token" }
 ]
 export const DetailsTab = () => {
   const [data, setData] = useState<ReportResponse>(JSON.parse(`{
@@ -118,8 +124,15 @@ export const DetailsTab = () => {
 }`))
 
   const [sampleIndex, setSampleIndex] = useState(0)
+  const [histogramSelection, setHistogramSelection] = useState<Option>(histogramMenu[0])
   const [anchorIndexMenu, setAnchorIndexMenu] = useState<null | HTMLElement>(null)
   const [anchorHistogramMenu, setAnchorHistogramMenu] = useState<null | HTMLElement>(null)
+  const [xData, setXData] = useState<number[]>(
+    (data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.nMessages))
+  )
+  const [distribution, setDistribution] = useState<Distribution | null>(
+    data.report.messageDistribution ?? null
+  )
 
   const onChangeSampleIndex = (index: number) => {
     setSampleIndex(index)
@@ -132,6 +145,25 @@ export const DetailsTab = () => {
 
   const onOpenHistogramMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorHistogramMenu(event.currentTarget)
+  }
+
+  const onChangeHistogramSelection = (value: Option) => {
+    switch (value.value) {
+      case "messages":
+        setDistribution(data.report.messageDistribution ?? null)
+        setXData((data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.nMessages)))
+        break
+      case "token":
+        setDistribution(data.report.tokensDistribution ?? null)
+        setXData((data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.messagesTokensSize)))
+        break
+      case "assistant-token":
+        setDistribution(data.report.assistantTokenDistribution ?? null)
+        setXData((data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.assistantMessageLen)))
+        break
+    }
+    setHistogramSelection(value)
+    onCloseHistogramMenu()
   }
 
   const onCloseIndexMenu = () => {
@@ -394,107 +426,104 @@ export const DetailsTab = () => {
           <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
         </>
       }
-      {data.report?.messageDistribution &&
-        <>
-          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-          <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
-            <Typography sx={{ my: 2 }} variant="h5">
-              Messages
-            </Typography>
-            <Button startIcon={<BarChartIcon />}
-                    endIcon={<KeyboardArrowDownIcon />}
-                    onClick={onOpenHistogramMenu}
-            >
-              Histogram
-            </Button>
-            <Menu anchorEl={anchorHistogramMenu}
-                  onClose={onCloseHistogramMenu}
-                  open={Boolean(anchorHistogramMenu)}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                  }}
-                  slotProps={{
-                    paper: {
-                      style: {
-                        maxHeight: "200px"
-                      }
-                    }
-                  }}>
-            </Menu>
-            <Card>
-              <CardContent>
-                <Plot
-                  data={[
-                    {
-                      x: (data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.nMessages)),
-                      type: 'histogram'
-                    }
-                  ]}
-                  layout={ {
-                    title: 'Distribution Histogram',
-                    xaxis: {title: "Messages Count"},
-                    yaxis: {title: "Frecuency"}
-                  } }
-                />
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-        </>
-      }
-      {data.report?.tokensDistribution &&
-        <>
-          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-          <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
-            <Typography sx={{ my: 2 }} variant="h5">
-              Message Tokens
-            </Typography>
+      <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
+      <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
+        <Typography sx={{ my: 2 }} variant="h5">
+          Distribution Histogram
+        </Typography>
+        <Button startIcon={<BarChartIcon />}
+                endIcon={<KeyboardArrowDownIcon />}
+                onClick={onOpenHistogramMenu}
+        >
+          Histogram: {histogramSelection.label}
+        </Button>
+        <Menu anchorEl={anchorHistogramMenu}
+              onClose={onCloseHistogramMenu}
+              open={Boolean(anchorHistogramMenu)}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              slotProps={{
+                paper: {
+                  style: {
+                    maxHeight: "200px"
+                  }
+                }
+              }}>
+          {histogramMenu.map((e, i) => (<>
+            <MenuItem key={i}
+                      selected={e.value === histogramSelection.value}
+                      onClick={() => onChangeHistogramSelection(e)}>
+              <ListItemIcon>
+                <DeblurIcon />
+              </ListItemIcon>
+              <ListItemText>
+                { e.label }
+              </ListItemText>
+            </MenuItem>
+          </>))}
+        </Menu>
+        <Card>
+          <CardContent>
             <Plot
               data={[
                 {
-                  x: (data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.messagesTokensSize)),
+                  x: xData,
                   type: 'histogram'
                 }
               ]}
               layout={ {
                 title: 'Distribution Histogram',
-                xaxis: {title: "Message Tokens"},
-                yaxis: {title: "Frecuency"}
+                xaxis: {title: histogramSelection.label},
+                yaxis: {title: "Frequency"}
               } }
             />
-          </Grid>
-          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-        </>
-      }
-      {data.report?.assistantTokenDistribution &&
-        <>
-          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-          <Grid item xs={12} sm={12} md={10} lg={8} xl={4}>
-            <Typography sx={{ my: 2 }} variant="h5">
-              Assistant Tokens
-            </Typography>
-            <Plot
-              data={[
-                {
-                  x: (data.report.tokens === undefined ? []: data.report.tokens.map((e) => e.assistantMessageLen)),
-                  type: 'histogram'
-                }
-              ]}
-              layout={ {
-                title: 'Distribution Histogram',
-                xaxis: {title: "Assistant Tokens"},
-                yaxis: {title: "Frecuency"}
-              } }
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
-        </>
-      }
+            {distribution !== null &&
+              <>
+                <Grid container
+                      spacing={2}>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="Max">
+                      { distribution.max }
+                    </LabelValue>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="Min">
+                      { distribution.min }
+                    </LabelValue>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="Median">
+                      { distribution.median }
+                    </LabelValue>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="Mean">
+                      { distribution.mean }
+                    </LabelValue>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="P1">
+                      { distribution.p1 }
+                    </LabelValue>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6} lg={4} xl={3}>
+                    <LabelValue label="P90">
+                      { distribution.p90 }
+                    </LabelValue>
+                  </Grid>
+                </Grid>
+              </>
+            }
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid item xs={12} sm={12} md={1} lg={2} xl={4}></Grid>
     </Grid>
   </>)
 }
