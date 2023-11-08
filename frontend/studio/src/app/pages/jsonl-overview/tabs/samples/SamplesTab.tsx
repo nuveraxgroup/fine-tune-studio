@@ -9,7 +9,7 @@ import * as React from "react";
 export const SamplesTab = () => {
   const [sampleIndex, setSampleIndex] = useState(0)
   const [anchorIndexMenu, setAnchorIndexMenu] = useState<null | HTMLElement>(null)
-  const [code, setCode] = useState("{}")
+  const [code, setCode] = useState(`{"hola":"mundo"}`)
 
   const onOpenIndexMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorIndexMenu(event.currentTarget)
@@ -73,8 +73,8 @@ export const SamplesTab = () => {
       theme="vs-dark"
       value={code}
       options={{
-        selectOnLineNumbers: true,
-        readOnly: true
+        readOnly: true,
+        language: "json"
       }}
       onChange={onChange}
       editorDidMount={editorDidMount}

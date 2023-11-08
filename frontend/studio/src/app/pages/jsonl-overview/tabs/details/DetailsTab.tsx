@@ -455,18 +455,17 @@ export const DetailsTab = () => {
                   }
                 }
               }}>
-          {histogramMenu.map((e, i) => (<>
+          {histogramMenu.map((e, i) => (
             <MenuItem key={i}
                       selected={e.value === histogramSelection.value}
                       onClick={() => onChangeHistogramSelection(e)}>
-              <ListItemIcon>
-                <BarChartIcon />
-              </ListItemIcon>
-              <ListItemText>
-                { e.label }
-              </ListItemText>
-            </MenuItem>
-          </>))}
+            <ListItemIcon>
+              <BarChartIcon />
+            </ListItemIcon>
+            <ListItemText>
+              { e.label }
+            </ListItemText>
+          </MenuItem>))}
         </Menu>
         <Card>
           <CardContent>
